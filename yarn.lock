@@ -679,6 +679,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cannon-es@npm:^0.20.0":
+  version: 0.20.0
+  resolution: "cannon-es@npm:0.20.0"
+  checksum: 10/80f3904049d969d81fec76927fc4af88bb137616f63937918acec4c5759ff5129c321f8925ddf7efed0e5c833309d1520bcf4072a6217b55687cfa5fe229c58c
+  languageName: node
+  linkType: hard
+
 "chokidar@npm:>=3.0.0 <4.0.0":
   version: 3.6.0
   resolution: "chokidar@npm:3.6.0"
@@ -1209,6 +1216,7 @@ __metadata:
   dependencies:
     "@types/three": "npm:^0"
     "@vitejs/plugin-vue": "npm:^5.0.4"
+    cannon-es: "npm:^0.20.0"
     sass: "npm:^1.77.5"
     three: "npm:^0.165.0"
     typescript: "npm:^5.2.2"

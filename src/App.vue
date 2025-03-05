@@ -1,207 +1,161 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import * as CANNON from "cannon-es";
 
-import { GLTFLoader } from "three/examples/jsm/Addons.js";
-import { Octree } from "three/examples/jsm/Addons.js";
-import { randFloat } from "three/src/math/MathUtils.js";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
+const sceneRef = ref<HTMLDivElement | null>(null);
+const marbles = reactive<any>([]);
+const world = new CANNON.World();
+const marbleBodies = ref<CANNON.Body[]>([]);
+const marbleMeshes = ref<THREE.Mesh[]>([]);
+let raceStarted = ref(false);
 
-const clock = new THREE.Clock();
-
-const target = ref();
-
-const colors = [0x6488ea, 0x0d2464, 0x6b8deb, 0xff460e, 0xa6ff70]
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setAnimationLoop(animate);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.VSMShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-
-const fillLight1 = new THREE.HemisphereLight(0x8dc1de, 0x00668d, 1.5);
-fillLight1.position.set(2, 1, 1);
-scene.add(fillLight1);
-
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2.5);
-directionalLight.position.set(-5, 25, -1);
-directionalLight.castShadow = true;
-directionalLight.shadow.camera.near = 0.01;
-directionalLight.shadow.camera.far = 500;
-directionalLight.shadow.camera.right = 30;
-directionalLight.shadow.camera.left = -30;
-directionalLight.shadow.camera.top = 30;
-directionalLight.shadow.camera.bottom = -30;
-directionalLight.shadow.mapSize.width = 1024;
-directionalLight.shadow.mapSize.height = 1024;
-directionalLight.shadow.radius = 4;
-directionalLight.shadow.bias = -0.00006;
-scene.add(directionalLight);
-
-camera.position.z = 70;
-camera.position.y = 70;
-
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.minDistance = 2;
-controls.maxDistance = 10;
-controls.target.set(0, 60, 40);
-controls.update();
-
-window.addEventListener("resize", onWindowResize);
-
-const GRAVITY = 30;
-
-const NUM_SPHERES = 10;
-const SPHERE_RADIUS = 0.2;
-
-const STEPS_PER_FRAME = 5;
-
-const sphereGeometry = new THREE.IcosahedronGeometry(SPHERE_RADIUS, 5);
-
-const spheres: any[] = [];
-
-for (let i = 0; i < NUM_SPHERES; i++) {
-  const sphereMaterial = new THREE.MeshLambertMaterial({ color: colors[~~(Math.random() * (colors.length+1))] });
-  const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-  sphere.castShadow = true;
-  sphere.receiveShadow = true;
-
-  scene.add(sphere);
-
-  spheres.push({
-    mesh: sphere,
-    collider: new THREE.Sphere(
-      new THREE.Vector3(
-        randFloat(-10, 10),
-        randFloat(70, 80),
-        randFloat(-10, 10)
-      ),
-      SPHERE_RADIUS
-    ),
-    velocity: new THREE.Vector3(),
-  });
+function addMarble() {
+  if (marbles.length < 10) {
+    marbles.push({ name: "", color: "#ff0000" });
+  }
 }
 
-const worldOctree = new Octree();
+function removeMarble(index : number) {
+  if (marbles.length > 1) {
+    marbles.splice(index, 1);
+  }
+}
 
-const vector1 = new THREE.Vector3();
-const vector2 = new THREE.Vector3();
-const vector3 = new THREE.Vector3();
+function setupScene() {
+  if (!sceneRef.value) return;
 
-window.addEventListener("resize", onWindowResize);
-
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
-}
+  sceneRef.value.appendChild(renderer.domElement);
 
-const loader = new GLTFLoader();
+  // Lighting
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(5, 5, 5).normalize();
+  scene.add(light);
 
-loader.load("slide.glb", (gltf) => {
-  scene.add(gltf.scene);
+  // Physics world
+  world.gravity.set(0, -9.81, 0);
 
-  worldOctree.fromGraphNode(gltf.scene);
+  // Racetrack (inclined plane)
+  const trackGeometry = new THREE.PlaneGeometry(20, 50);
+  const trackMaterial = new THREE.MeshStandardMaterial({ color: 0x006600 });
+  const trackMesh = new THREE.Mesh(trackGeometry, trackMaterial);
+  trackMesh.rotation.x = -Math.PI / 2.2; // Slightly inclined for downhill effect
+  scene.add(trackMesh);
 
-  gltf.scene.traverse((child) => {
-    if (child instanceof THREE.Mesh) {
-      child.castShadow = true;
-      child.receiveShadow = true;
+  const trackBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane() });
+  trackBody.quaternion.setFromEuler(-Math.PI / 2.2, 0, 0);
+  world.addBody(trackBody);
 
-      if (child.material.map) {
-        child.material.map.anisotropy = 4;
-      }
-    }
+  // Guardrails
+  const railMaterial = new THREE.MeshStandardMaterial({ color: 0x444444 });
+  const railGeometry = new THREE.BoxGeometry(1, 1, 50);
+
+  const leftRailMesh = new THREE.Mesh(railGeometry, railMaterial);
+  leftRailMesh.position.set(-10.5, 0.5, 0);
+  scene.add(leftRailMesh);
+
+  const rightRailMesh = new THREE.Mesh(railGeometry, railMaterial);
+  rightRailMesh.position.set(10.5, 0.5, 0);
+  scene.add(rightRailMesh);
+
+  const leftRailBody = new CANNON.Body({
+    mass: 0,
+    shape: new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 25)),
   });
-});
+  leftRailBody.position.set(-10.5, 0.5, 0);
+  world.addBody(leftRailBody);
 
-function spheresCollisions() {
-  for (let i = 0, length = spheres.length; i < length; i++) {
-    const s1 = spheres[i];
+  const rightRailBody = new CANNON.Body({
+    mass: 0,
+    shape: new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 25)),
+  });
+  rightRailBody.position.set(10.5, 0.5, 0);
+  world.addBody(rightRailBody);
 
-    for (let j = i + 1; j < length; j++) {
-      const s2 = spheres[j];
+  // Create Marbles
+  marbles.forEach((marble : any, index : number) => {
+    const body = new CANNON.Body({
+      mass: 1,
+      shape: new CANNON.Sphere(0.5),
+      type: CANNON.Body.STATIC,
+    });
+    body.position.set((index - 5) * 2, 10, -22);
+    world.addBody(body);
+    marbleBodies.value.push(body);
 
-      const d2 = s1.collider.center.distanceToSquared(s2.collider.center);
-      const r = s1.collider.radius + s2.collider.radius;
-      const r2 = r * r;
-
-      if (d2 < r2) {
-        const normal = vector1
-          .subVectors(s1.collider.center, s2.collider.center)
-          .normalize();
-        const v1 = vector2.copy(normal).multiplyScalar(normal.dot(s1.velocity));
-        const v2 = vector3.copy(normal).multiplyScalar(normal.dot(s2.velocity));
-
-        s1.velocity.add(v2).sub(v1);
-        s2.velocity.add(v1).sub(v2);
-
-        const d = (r - Math.sqrt(d2)) / 2;
-
-        s1.collider.center.addScaledVector(normal, d);
-        s2.collider.center.addScaledVector(normal, -d);
-      }
-    }
-  }
-}
-
-function updateSpheres(deltaTime: number) {
-  spheres.forEach((sphere) => {
-    sphere.collider.center.addScaledVector(sphere.velocity, deltaTime);
-
-    const result = worldOctree.sphereIntersect(sphere.collider);
-
-    if (result) {
-      sphere.velocity.addScaledVector(
-        result.normal,
-        -result.normal.dot(sphere.velocity) * 1.5
-      );
-      sphere.collider.center.add(result.normal.multiplyScalar(result.depth));
-    } else {
-      sphere.velocity.y -= GRAVITY * deltaTime;
-    }
-
-    const damping = Math.exp(-1.5 * deltaTime) - 1;
-    sphere.velocity.addScaledVector(sphere.velocity, damping);
+    const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+    const material = new THREE.MeshStandardMaterial({ color: marble.color });
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+    marbleMeshes.value.push(mesh);
   });
 
-  spheresCollisions();
+  // Controls
+  const controls = new OrbitControls(camera, renderer.domElement);
+  camera.position.set(0, 10, 15);
+  controls.update();
 
-  for (const sphere of spheres) {
-    sphere.mesh.position.copy(sphere.collider.center);
+  // Animation loop
+  function animate() {
+    requestAnimationFrame(animate);
+    world.step(1 / 60);
+    marbleMeshes.value.forEach((mesh, index) => {
+      mesh.position.copy(marbleBodies.value[index].position);
+    });
+    renderer.render(scene, camera);
   }
+  animate();
 }
 
-function animate() {
-  const deltaTime = Math.min(0.05, clock.getDelta()) / STEPS_PER_FRAME;
+function startRace() {
+  raceStarted.value = true;
+  marbleBodies.value.forEach((body) => {
+    body.type = CANNON.Body.DYNAMIC;
+    body.velocity.set(0, 0, 5);
+  });
+}
 
-  for (let i = 0; i < STEPS_PER_FRAME; i++) {
-    updateSpheres(deltaTime);
-  }
-
-  renderer.render(scene, camera);
+function resetRace() {
+  raceStarted.value = false;
+  marbleBodies.value.forEach((body, index) => {
+    body.type = CANNON.Body.STATIC;
+    body.position.set((index - 5) * 2, 10, -22);
+    body.velocity.set(0, 0, 0);
+  });
 }
 
 onMounted(() => {
-  target.value.appendChild(renderer.domElement);
-  animate();
+  for (let i = 0; i < 5; i++) {
+    addMarble();
+  }
+  setupScene();
 });
 </script>
 
 <template>
-  <div class="TODO">Page is being built...</div>
-  <div ref="target"></div>
+  <div>
+    <div v-for="(marble, index) in marbles" :key="index">
+      <input v-model="marble.name" placeholder="Marble Name" />
+      <input v-model="marble.color" type="color" />
+      <button @click="removeMarble(index)" v-if="marbles.length > 1">
+        Remove
+      </button>
+    </div>
+    <button @click="addMarble" v-if="marbles.length < 10">Add Marble</button>
+    <button @click="startRace">Start Race</button>
+    <button @click="resetRace">Reset Race</button>
+    <div ref="sceneRef" style="width: 100vw; height: 100vh"></div>
+  </div>
 </template>
 
 <style scoped>
