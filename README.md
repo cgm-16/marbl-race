@@ -10,5 +10,4 @@ A 3d Marble racer. Nothing more, nothing less.
 - Vite
 
 ## To-do
-
-- Prototype the thing
+- [x] Prototype the thing
