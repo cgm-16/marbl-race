@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "cannon-es": "^0.20.0",
@@ -15,10 +18,13 @@
   },
   "devDependencies": {
     "@types/three": "^0",
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^26.1.0",
     "sass": "^1.77.5",
     "typescript": "^5.2.2",
     "vite": "^5.2.0",
+    "vitest": "^3.2.4",
     "vue-tsc": "^2.0.6"
   },
   "packageManager": "yarn@4.3.0"
