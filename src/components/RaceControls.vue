@@ -27,13 +27,11 @@ interface Props {
   raceStatus: 'ready' | 'running' | 'finished'
 }
 
-interface Emits {
+const props = defineProps<Props>()
+defineEmits<{
   startRace: []
   resetRace: []
-}
-
-const props = defineProps<Props>()
-defineEmits<Emits>()
+}>()
 
 const startButtonText = computed(() => {
   switch (props.raceStatus) {

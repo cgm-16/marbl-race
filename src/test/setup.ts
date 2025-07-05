@@ -3,10 +3,10 @@
 import { vi } from 'vitest'
 
 // Mock requestAnimationFrame for testing
-global.requestAnimationFrame = vi.fn(cb => {
+globalThis.requestAnimationFrame = vi.fn(cb => {
   setTimeout(cb, 16)
   return 1
 })
 
 // Mock cancelAnimationFrame for testing
-global.cancelAnimationFrame = vi.fn()
+globalThis.cancelAnimationFrame = vi.fn()

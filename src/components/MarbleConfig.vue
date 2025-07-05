@@ -50,14 +50,12 @@ interface Props {
   canRemoveMarble: boolean
 }
 
-interface Emits {
+const props = defineProps<Props>()
+const emit = defineEmits<{
   addMarble: []
   removeMarble: [index: number]
   updateMarble: [index: number, marble: Marble]
-}
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+}>()
 
 const updateMarbleName = (index: number, event: Event) => {
   const target = event.target as HTMLInputElement
