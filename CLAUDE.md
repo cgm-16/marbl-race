@@ -111,5 +111,5 @@ When you are using /compact, please focus on our conversation, your most recent 
 
 # Technical knowledge
 - @.claude/docs/node.md
-- @.claude/docs/pnpm_commands.md
+- @.claude/docs/yarn_context.md
 - @.claude/docs/fnm_commands.md
