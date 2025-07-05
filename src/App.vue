@@ -26,8 +26,9 @@ const handleResetRace = () => {
 }
 
 const handleRaceFinish = (winnerIndex: number) => {
-  // TODO: This will be called from Scene3D when a marble wins
-  console.log(`Marble ${winnerIndex} wins!`)
+  const winner = marbles.value[winnerIndex]
+  alert(`${winner.name} wins the race!`)
+  // The race state will be managed by useRace composable in the future
 }
 
 onMounted(() => {

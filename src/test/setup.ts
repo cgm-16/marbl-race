@@ -10,3 +10,10 @@ globalThis.requestAnimationFrame = vi.fn(cb => {
 
 // Mock cancelAnimationFrame for testing
 globalThis.cancelAnimationFrame = vi.fn()
+
+// Mock HTMLCanvasElement.getContext for testing
+HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+  font: '',
+  fillStyle: '',
+  fillText: vi.fn()
+})) as any

@@ -6,6 +6,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useScene3D } from '../composables/useScene3D'
 import type { Marble } from '../types/marble'
 
 interface Props {
@@ -20,28 +21,52 @@ const emit = defineEmits<{
 }>()
 
 const sceneContainer = ref<HTMLDivElement | null>(null)
+const { 
+  isInitialized, 
+  raceActive, 
+  initializeScene, 
+  startRace, 
+  resetRace, 
+  destroy 
+} = useScene3D()
 
-// We'll implement the actual 3D scene setup after we refactor App.vue
-// This is a placeholder component for now
+const handleRaceFinish = (winnerIndex: number) => {
+  emit('raceFinish', winnerIndex)
+}
+
 onMounted(() => {
-  console.log('Scene3D component mounted')
+  if (sceneContainer.value && props.marbles.length > 0) {
+    initializeScene(sceneContainer.value as unknown as HTMLElement, props.marbles, handleRaceFinish)
+  }
 })
 
 onUnmounted(() => {
-  console.log('Scene3D component unmounted')
+  destroy()
 })
 
-watch(() => props.raceStarted, (newValue) => {
-  if (newValue) {
-    console.log('Race started in Scene3D')
+// Watch for race state changes
+watch(() => props.raceStarted, (newValue, oldValue) => {
+  if (newValue && !oldValue && isInitialized.value) {
+    startRace()
   }
 })
 
-watch(() => props.raceFinished, (newValue) => {
-  if (newValue) {
-    console.log('Race finished in Scene3D')
+watch(() => props.raceFinished, (newValue, oldValue) => {
+  if (newValue && !oldValue && isInitialized.value) {
+    // Race finished externally, reset if needed
+    if (raceActive.value) {
+      resetRace()
+    }
   }
 })
+
+// Watch for marble changes and reinitialize scene
+watch(() => props.marbles, (newMarbles) => {
+  if (sceneContainer.value && newMarbles.length > 0 && !raceActive.value) {
+    destroy()
+    initializeScene(sceneContainer.value as unknown as HTMLElement, newMarbles, handleRaceFinish)
+  }
+}, { deep: true })
 </script>
 
 <style scoped>

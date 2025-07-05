@@ -5,10 +5,13 @@ export interface Marble {
   color: string
 }
 
+import type * as CANNON from 'cannon-es'
+import type * as THREE from 'three'
+
 export interface MarblePhysics {
-  body: any // CANNON.Body
-  mesh: any // THREE.Mesh
-  label: any // THREE.Sprite
+  body: CANNON.Body
+  mesh: THREE.Mesh
+  label: THREE.Sprite
 }
 
 export interface RaceState {
