@@ -21,9 +21,32 @@ export function useScene3D() {
   // Marble objects
   const marblePhysics = ref<MarblePhysics[]>([])
   const finishLineZ = 180
+  let currentMarbles: Marble[] = []
   
   // Callbacks
   let onRaceFinish: ((winnerIndex: number) => void) | null = null
+
+  // Helper function to calculate optimal camera position based on marble positions
+  const getOptimalCameraPosition = (marbles: Marble[]) => {
+    if (marbles.length === 0) return { x: 0, y: 10, z: 15 }
+    
+    // Calculate center X position based on marble spawn positions
+    let totalX = 0
+    marbles.forEach((_, index) => {
+      totalX += (index - 5) * 2  // Using current marble position formula
+    })
+    const centerX = totalX / marbles.length
+    
+    // Position camera above and behind the starting line
+    const marbleY = 50  // Current marble Y position
+    const marbleZ = -200  // Current marble Z position
+    
+    return {
+      x: centerX,           // Center on marbles
+      y: marbleY + 10,      // 10 units above marbles
+      z: marbleZ + 15       // 15 units behind starting line
+    }
+  }
 
   const initializeScene = (
     container: HTMLElement, 
@@ -33,6 +56,7 @@ export function useScene3D() {
     if (isInitialized.value) return
     
     onRaceFinish = onFinish || null
+    currentMarbles = marbles
     
     // Create scene
     scene = new THREE.Scene()
@@ -68,7 +92,10 @@ export function useScene3D() {
     
     // Setup camera controls
     controls = new OrbitControls(camera, renderer.domElement)
-    camera.position.set(0, 10, 15)
+    
+    // Set camera position based on marble positions
+    const cameraPos = getOptimalCameraPosition(marbles)
+    camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z)
     controls.update()
     
     // Start animation loop
@@ -275,9 +302,10 @@ export function useScene3D() {
       )
     })
     
-    // Reset camera to initial position
+    // Reset camera to optimal position based on marble positions
     if (camera && controls) {
-      camera.position.set(0, 10, 15)
+      const cameraPos = getOptimalCameraPosition(currentMarbles)
+      camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z)
       controls.update()
     }
   }
