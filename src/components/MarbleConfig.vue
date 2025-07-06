@@ -1,48 +1,51 @@
 <!-- ABOUTME: Component for configuring marble names and colors -->
 <!-- ABOUTME: Provides UI for adding, removing, and editing marble properties with visual preview -->
 <template>
-  <div class="marble-config">
+  <div class="marble-config" :class="{ 'race-active': raceStarted }">
     <div v-if="raceStarted" class="race-active-notice">
       <strong>Race Active</strong> - Marble editing disabled
     </div>
-    <div
-      v-for="(marble, index) in marbles"
-      :key="index"
-      class="marble-item"
-    >
-      <div class="marble-preview">
-        <div
-          class="marble-sphere"
-          :style="{ backgroundColor: marble.color }"
-        ></div>
-        <div class="marble-label">{{ marble.name || `Marble ${index + 1}` }}</div>
-      </div>
-      <div class="marble-controls">
-        <input
-          :data-testid="`marble-name-${index}`"
-          :value="marble.name"
-          @input="updateMarbleName(index, $event)"
-          placeholder="Marble Name"
-          class="marble-name"
-          :disabled="raceStarted"
-        />
-        <input
-          :data-testid="`marble-color-${index}`"
-          :value="marble.color"
-          @input="updateMarbleColor(index, $event)"
-          type="color"
-          class="marble-color"
-          :disabled="raceStarted"
-        />
-        <button
-          v-if="canRemoveMarble"
-          :data-testid="`remove-marble-${index}`"
-          @click="$emit('removeMarble', index)"
-          class="remove-button"
-          :disabled="raceStarted"
-        >
-          Remove
-        </button>
+    <div class="marble-list">
+
+      <div
+        v-for="(marble, index) in marbles"
+        :key="index"
+        class="marble-item"
+      >
+        <div class="marble-preview">
+          <div
+            class="marble-sphere"
+            :style="{ backgroundColor: marble.color }"
+          ></div>
+          <div class="marble-label">{{ marble.name || `Marble ${index + 1}` }}</div>
+        </div>
+        <div class="marble-controls">
+          <input
+            :data-testid="`marble-name-${index}`"
+            :value="marble.name"
+            @input="updateMarbleName(index, $event)"
+            placeholder="Marble Name"
+            class="marble-name"
+            :disabled="raceStarted"
+          />
+          <input
+            :data-testid="`marble-color-${index}`"
+            :value="marble.color"
+            @input="updateMarbleColor(index, $event)"
+            type="color"
+            class="marble-color"
+            :disabled="raceStarted"
+          />
+          <button
+            v-if="canRemoveMarble"
+            :data-testid="`remove-marble-${index}`"
+            @click="$emit('removeMarble', index)"
+            class="remove-button"
+            :disabled="raceStarted"
+          >
+            Remove
+          </button>
+        </div>
       </div>
     </div>
     <button
@@ -99,6 +102,11 @@ const updateMarbleColor = (index: number, event: Event) => {
   left: 20px;
   z-index: 10;
   min-width: 320px;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.marble-config.race-active {
+  opacity: 0.2;
 }
 
 .race-active-notice {
@@ -109,6 +117,11 @@ const updateMarbleColor = (index: number, event: Event) => {
   text-align: center;
   color: #e65100;
   font-size: 14px;
+}
+
+.marble-list {
+  height: 30vh;
+  overflow-y: auto;
 }
 
 .marble-item {
