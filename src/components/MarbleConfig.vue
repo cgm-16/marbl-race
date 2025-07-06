@@ -93,16 +93,18 @@ const updateMarbleColor = (index: number, event: Event) => {
 .marble-config {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  padding: 20px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
+  gap: 16px;
+  padding: 24px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
   position: absolute;
   top: 20px;
   left: 20px;
   z-index: 10;
-  min-width: 320px;
+  min-width: 340px;
   transition: opacity 0.3s ease-in-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .marble-config.race-active {
@@ -110,13 +112,14 @@ const updateMarbleColor = (index: number, event: Event) => {
 }
 
 .race-active-notice {
-  padding: 10px;
-  background-color: rgba(255, 165, 0, 0.2);
-  border: 2px solid #ff9800;
-  border-radius: 6px;
+  padding: 12px;
+  background-color: rgba(255, 165, 0, 0.1);
+  border: 1px solid #ff9800;
+  border-radius: 8px;
   text-align: center;
   color: #e65100;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .marble-list {
@@ -127,20 +130,21 @@ const updateMarbleColor = (index: number, event: Event) => {
 .marble-item {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background-color: rgba(255, 255, 255, 0.5);
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s ease;
 }
 
 .marble-preview {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
+  padding: 12px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
 }
 
 .marble-sphere {
@@ -167,23 +171,32 @@ const updateMarbleColor = (index: number, event: Event) => {
 
 .marble-name {
   flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.marble-name:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
 .marble-name:disabled {
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
   color: #666;
   cursor: not-allowed;
 }
 
 .marble-color {
   width: 50px;
-  height: 35px;
-  border: none;
-  border-radius: 4px;
+  height: 38px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .marble-color:disabled {
@@ -192,16 +205,21 @@ const updateMarbleColor = (index: number, event: Event) => {
 }
 
 .remove-button {
-  padding: 8px 12px;
-  background-color: #ff4444;
+  padding: 10px 16px;
+  background-color: #ff5252;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .remove-button:hover:not(:disabled) {
-  background-color: #cc0000;
+  background-color: #f44336;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 82, 82, 0.3);
 }
 
 .remove-button:disabled {
@@ -210,16 +228,21 @@ const updateMarbleColor = (index: number, event: Event) => {
 }
 
 .add-button {
-  padding: 10px;
+  padding: 12px 20px;
   background-color: #4CAF50;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .add-button:hover:not(:disabled) {
   background-color: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 .add-button:disabled {

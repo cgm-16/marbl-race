@@ -50,24 +50,27 @@ const startButtonText = computed(() => {
 <style scoped>
 .race-controls {
   display: flex;
-  gap: 10px;
-  padding: 20px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
+  gap: 12px;
+  padding: 24px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
   position: absolute;
   bottom: 20px;
   left: 20px;
   z-index: 10;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .control-button {
-  padding: 12px 24px;
+  padding: 14px 28px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  min-width: 120px;
 }
 
 .start-button {
@@ -77,6 +80,8 @@ const startButtonText = computed(() => {
 
 .start-button:hover:not(:disabled) {
   background-color: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
 .start-button:disabled {
@@ -90,6 +95,8 @@ const startButtonText = computed(() => {
 }
 
 .reset-button:hover {
-  background-color: #da190b;
+  background-color: #d32f2f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
 }
 </style>
