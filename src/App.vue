@@ -20,7 +20,6 @@ const handleUpdateMarble = (index: number, updatedMarble: any) => {
 
 const handleStartRace = () => {
   startRace()
-  // TODO: Start physics simulation
 }
 
 const handleResetRace = () => {

@@ -148,4 +148,22 @@ describe('App (Refactored)', () => {
     expect(scene3D.props('raceFinished')).toBe(false)
     expect(Array.isArray(scene3D.props('marbles'))).toBe(true)
   })
+
+  it('should start physics simulation when race starts', async () => {
+    const wrapper = mount(App)
+    await wrapper.vm.$nextTick()
+    
+    const raceControls = wrapper.findComponent({ name: 'RaceControls' })
+    const scene3D = wrapper.findComponent({ name: 'Scene3D' })
+    
+    // Verify initial state
+    expect(scene3D.props('raceStarted')).toBe(false)
+    
+    // Start the race
+    await raceControls.vm.$emit('start-race')
+    await wrapper.vm.$nextTick()
+    
+    // Verify that physics simulation is started (Scene3D should receive raceStarted: true)
+    expect(scene3D.props('raceStarted')).toBe(true)
+  })
 })
