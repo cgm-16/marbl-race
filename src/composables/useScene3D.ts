@@ -274,6 +274,12 @@ export function useScene3D() {
         mesh.position.z
       )
     })
+    
+    // Reset camera to initial position
+    if (camera && controls) {
+      camera.position.set(0, 10, 15)
+      controls.update()
+    }
   }
 
   const destroy = () => {
