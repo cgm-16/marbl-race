@@ -73,8 +73,8 @@ export function useScene3D() {
     container.appendChild(renderer.domElement)
     
     // Add lighting
-    const light = new THREE.DirectionalLight(0xffffff, 1)
-    light.position.set(5, 5, 5).normalize()
+    const light = new THREE.DirectionalLight(0xffffff, 0.7)
+    light.position.set(5, 30, 5).normalize()
     scene.add(light)
     
     // Initialize physics world
