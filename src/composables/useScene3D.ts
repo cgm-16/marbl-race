@@ -44,7 +44,7 @@ export function useScene3D() {
     return {
       x: centerX,           // Center on marbles
       y: marbleY + 10,      // 10 units above marbles
-      z: marbleZ + 15       // 15 units behind starting line
+      z: marbleZ - 20       // 20 units behind starting line
     }
   }
 
