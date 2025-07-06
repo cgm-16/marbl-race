@@ -30,6 +30,11 @@ const {
   destroy 
 } = useScene3D()
 
+// Expose resetRace function to parent component
+defineExpose({
+  resetRace
+})
+
 const handleRaceFinish = (winnerIndex: number) => {
   emit('raceFinish', winnerIndex)
 }

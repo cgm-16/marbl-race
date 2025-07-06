@@ -1,7 +1,7 @@
 <!-- ABOUTME: Main application component for marble racing game -->
 <!-- ABOUTME: Orchestrates UI components and manages application state -->
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import MarbleConfig from './components/MarbleConfig.vue'
 import RaceControls from './components/RaceControls.vue'
 import Scene3D from './components/Scene3D.vue'
@@ -10,6 +10,9 @@ import { useRace } from './composables/useRace'
 
 const { marbles, addMarble, removeMarble, canAddMarble, canRemoveMarble } = useMarbles()
 const { raceState, startRace, resetRace, raceStatus } = useRace()
+
+// Template ref to access Scene3D component
+const scene3DRef = ref<InstanceType<typeof Scene3D>>()
 
 const handleUpdateMarble = (index: number, updatedMarble: any) => {
   marbles.value[index] = updatedMarble
@@ -22,7 +25,8 @@ const handleStartRace = () => {
 
 const handleResetRace = () => {
   resetRace()
-  // TODO: Reset physics simulation
+  // Reset physics simulation
+  scene3DRef.value?.resetRace()
 }
 
 const handleRaceFinish = (winnerIndex: number) => {
@@ -57,6 +61,7 @@ onMounted(() => {
     />
     
     <Scene3D
+      ref="scene3DRef"
       :marbles="marbles"
       :race-started="raceState.started"
       :race-finished="raceState.finished"

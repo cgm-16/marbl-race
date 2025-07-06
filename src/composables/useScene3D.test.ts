@@ -43,7 +43,12 @@ vi.mock('three', () => ({
       drawElements: vi.fn(),
       drawArrays: vi.fn()
     }
-    mockCanvas.getContext = vi.fn(() => mockGL)
+    mockCanvas.getContext = vi.fn((contextId: string) => {
+      if (contextId === 'webgl' || contextId === 'webgl2') {
+        return mockGL
+      }
+      return null
+    }) as any
     
     return { 
       setSize: vi.fn(),
