@@ -12,6 +12,7 @@ export interface MarblePhysics {
   body: CANNON.Body
   mesh: THREE.Mesh
   label: THREE.Sprite
+  light: THREE.PointLight
 }
 
 export interface RaceState {

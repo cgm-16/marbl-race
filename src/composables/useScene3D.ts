@@ -210,7 +210,12 @@ export function useScene3D() {
       sprite.scale.set(2, 1, 1)
       scene!.add(sprite)
       
-      marblePhysics.value.push({ body, mesh, label: sprite })
+      // Add soft point light for each marble
+      const pointLight = new THREE.PointLight(marble.color, 0.5, 5)
+      pointLight.position.copy(mesh.position)
+      scene!.add(pointLight)
+      
+      marblePhysics.value.push({ body, mesh, label: sprite, light: pointLight })
     })
   }
 
@@ -223,7 +228,7 @@ export function useScene3D() {
     // Update marble positions
     let leadMarble: THREE.Mesh | null = null
     marblePhysics.value.forEach((marblePhysic) => {
-      const { body, mesh, label } = marblePhysic
+      const { body, mesh, label, light } = marblePhysic
       const bodyPos = body.position as any
       mesh.position.set(bodyPos.x, bodyPos.y, bodyPos.z)
       label.position.set(
@@ -231,6 +236,7 @@ export function useScene3D() {
         mesh.position.y + 1,
         mesh.position.z
       )
+      light.position.copy(mesh.position)
       
       if (!leadMarble || (mesh.position.z > (leadMarble as THREE.Mesh).position.z)) {
         leadMarble = mesh as THREE.Mesh
@@ -284,7 +290,7 @@ export function useScene3D() {
 
   const resetRace = () => {
     raceActive.value = false
-    marblePhysics.value.forEach(({ body, mesh, label }, marbleIndex) => {
+    marblePhysics.value.forEach(({ body, mesh, label, light }, marbleIndex) => {
       body.type = CANNON.Body.STATIC
       const pos = body.position as any
       pos.set((marbleIndex - 5) * 2, 50, -200)
@@ -300,6 +306,9 @@ export function useScene3D() {
         mesh.position.y + 1,
         mesh.position.z
       )
+      
+      // Update light position immediately
+      light.position.copy(mesh.position)
     })
     
     // Reset camera to optimal position based on marble positions
