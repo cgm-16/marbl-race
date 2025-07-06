@@ -49,6 +49,7 @@ onMounted(() => {
       :marbles="marbles"
       :can-add-marble="canAddMarble"
       :can-remove-marble="canRemoveMarble"
+      :race-started="raceState.started"
       @add-marble="addMarble"
       @remove-marble="removeMarble"
       @update-marble="handleUpdateMarble"

@@ -13,7 +13,8 @@ describe('MarbleConfig', () => {
           { name: 'Marble 2', color: '#00ff00' }
         ],
         canAddMarble: true,
-        canRemoveMarble: true
+        canRemoveMarble: true,
+        raceStarted: false
       }
     })
 
@@ -29,7 +30,8 @@ describe('MarbleConfig', () => {
       props: {
         marbles: [],
         canAddMarble: true,
-        canRemoveMarble: false
+        canRemoveMarble: false,
+        raceStarted: false
       }
     })
 
@@ -46,7 +48,8 @@ describe('MarbleConfig', () => {
           { name: 'Marble 2', color: '#00ff00' }
         ],
         canAddMarble: true,
-        canRemoveMarble: true
+        canRemoveMarble: true,
+        raceStarted: false
       }
     })
 
@@ -63,7 +66,8 @@ describe('MarbleConfig', () => {
           { name: 'Marble 1', color: '#ff0000' }
         ],
         canAddMarble: true,
-        canRemoveMarble: false
+        canRemoveMarble: false,
+        raceStarted: false
       }
     })
 
@@ -79,7 +83,8 @@ describe('MarbleConfig', () => {
       props: {
         marbles: [],
         canAddMarble: false,
-        canRemoveMarble: false
+        canRemoveMarble: false,
+        raceStarted: false
       }
     })
 
@@ -94,11 +99,89 @@ describe('MarbleConfig', () => {
           { name: 'Marble 1', color: '#ff0000' }
         ],
         canAddMarble: true,
-        canRemoveMarble: false
+        canRemoveMarble: false,
+        raceStarted: false
       }
     })
 
     const removeButton = wrapper.find('[data-testid="remove-marble-0"]')
     expect(removeButton.exists()).toBe(false)
+  })
+
+  it('should show race active notice when race is started', () => {
+    const wrapper = mount(MarbleConfig, {
+      props: {
+        marbles: [
+          { name: 'Marble 1', color: '#ff0000' }
+        ],
+        canAddMarble: true,
+        canRemoveMarble: true,
+        raceStarted: true
+      }
+    })
+
+    const raceNotice = wrapper.find('.race-active-notice')
+    expect(raceNotice.exists()).toBe(true)
+    expect(raceNotice.text()).toContain('Race Active')
+  })
+
+  it('should disable all inputs when race is started', () => {
+    const wrapper = mount(MarbleConfig, {
+      props: {
+        marbles: [
+          { name: 'Marble 1', color: '#ff0000' }
+        ],
+        canAddMarble: true,
+        canRemoveMarble: true,
+        raceStarted: true
+      }
+    })
+
+    const nameInput = wrapper.find('[data-testid="marble-name-0"]')
+    const colorInput = wrapper.find('[data-testid="marble-color-0"]')
+    const removeButton = wrapper.find('[data-testid="remove-marble-0"]')
+    const addButton = wrapper.find('[data-testid="add-marble"]')
+
+    expect(nameInput.attributes('disabled')).toBeDefined()
+    expect(colorInput.attributes('disabled')).toBeDefined()
+    expect(removeButton.attributes('disabled')).toBeDefined()
+    expect(addButton.attributes('disabled')).toBeDefined()
+  })
+
+  it('should display marble preview with correct color and name', () => {
+    const wrapper = mount(MarbleConfig, {
+      props: {
+        marbles: [
+          { name: 'Red Marble', color: '#ff0000' }
+        ],
+        canAddMarble: true,
+        canRemoveMarble: true,
+        raceStarted: false
+      }
+    })
+
+    const marblePreview = wrapper.find('.marble-preview')
+    const marbleSphere = wrapper.find('.marble-sphere')
+    const marbleLabel = wrapper.find('.marble-label')
+
+    expect(marblePreview.exists()).toBe(true)
+    expect(marbleSphere.attributes('style')).toContain('background-color: rgb(255, 0, 0)')
+    expect(marbleLabel.text()).toBe('Red Marble')
+  })
+
+  it('should display fallback name when marble name is empty', () => {
+    const wrapper = mount(MarbleConfig, {
+      props: {
+        marbles: [
+          { name: '', color: '#ff0000' }
+        ],
+        canAddMarble: true,
+        canRemoveMarble: true,
+        raceStarted: false
+      }
+    })
+
+    const marbleLabel = wrapper.find('.marble-label')
+    expect(marbleLabel.text()).toBe('Marble 1')
   })
 })
