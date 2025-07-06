@@ -59,6 +59,7 @@ vi.mock('three', () => ({
     }
   }),
   DirectionalLight: vi.fn(() => ({ position: { set: vi.fn(() => ({ normalize: vi.fn() })) } })),
+  PointLight: vi.fn(() => ({ position: { copy: vi.fn() } })),
   PlaneGeometry: vi.fn(),
   BoxGeometry: vi.fn(),
   CylinderGeometry: vi.fn(),

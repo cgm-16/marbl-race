@@ -10,7 +10,7 @@ export function useMarbles() {
     if (marbles.value.length >= 10) return
     
     // Generate random color
-    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16)
+    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')
     
     marbles.value.push({
       name: `Marble ${marbles.value.length + 1}`,

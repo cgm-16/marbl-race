@@ -18,10 +18,8 @@ describe('useMarbles', () => {
     marbleManager.addMarble()
     
     expect(marbleManager.marbles.value).toHaveLength(1)
-    expect(marbleManager.marbles.value[0]).toEqual({
-      name: 'Marble 1',
-      color: '#ff0000'
-    })
+    expect(marbleManager.marbles.value[0].name).toBe('Marble 1')
+    expect(marbleManager.marbles.value[0].color).toMatch(/^#[0-9a-f]{6}$/i)
   })
 
   it('should add multiple marbles with incremented names', () => {
