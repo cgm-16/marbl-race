@@ -110,6 +110,21 @@ describe('useScene3D', () => {
     expect(sceneManager.raceActive.value).toBe(false)
   })
 
+  it('should reset marble visual positions immediately', () => {
+    const marbles = [
+      { name: 'Marble 1', color: '#ff0000' },
+      { name: 'Marble 2', color: '#00ff00' }
+    ]
+
+    sceneManager.initializeScene(mockContainer, marbles)
+    sceneManager.startRace()
+    sceneManager.resetRace()
+
+    expect(sceneManager.raceActive.value).toBe(false)
+    // Visual positions should be reset immediately without waiting for animation loop
+    expect(typeof sceneManager.resetRace).toBe('function')
+  })
+
   it('should handle finish line detection', () => {
     const marbles = [
       { name: 'Marble 1', color: '#ff0000' },

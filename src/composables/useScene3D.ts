@@ -257,12 +257,22 @@ export function useScene3D() {
 
   const resetRace = () => {
     raceActive.value = false
-    marblePhysics.value.forEach(({ body }, marbleIndex) => {
+    marblePhysics.value.forEach(({ body, mesh, label }, marbleIndex) => {
       body.type = CANNON.Body.STATIC
       const pos = body.position as any
       pos.set((marbleIndex - 5) * 2, 50, -200)
       const vel = body.velocity as any
       vel.set(0, 0, 0)
+      
+      // Update visual mesh position immediately
+      mesh.position.set((marbleIndex - 5) * 2, 50, -200)
+      
+      // Update label position immediately
+      label.position.set(
+        mesh.position.x,
+        mesh.position.y + 1,
+        mesh.position.z
+      )
     })
   }
 
