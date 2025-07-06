@@ -198,4 +198,28 @@ describe('useScene3D', () => {
 
     expect(sceneManager.isInitialized.value).toBe(false)
   })
+
+  it('should position camera dynamically based on marble count', () => {
+    const twoMarbles = [
+      { name: 'Marble 1', color: '#ff0000' },
+      { name: 'Marble 2', color: '#00ff00' }
+    ]
+
+    sceneManager.initializeScene(mockContainer, twoMarbles)
+    expect(sceneManager.isInitialized.value).toBe(true)
+
+    const sevenMarbles = [
+      { name: 'Marble 1', color: '#ff0000' },
+      { name: 'Marble 2', color: '#00ff00' },
+      { name: 'Marble 3', color: '#0000ff' },
+      { name: 'Marble 4', color: '#ffff00' },
+      { name: 'Marble 5', color: '#ff00ff' },
+      { name: 'Marble 6', color: '#00ffff' },
+      { name: 'Marble 7', color: '#ffffff' }
+    ]
+
+    sceneManager.destroy()
+    sceneManager.initializeScene(mockContainer, sevenMarbles)
+    expect(sceneManager.isInitialized.value).toBe(true)
+  })
 })
